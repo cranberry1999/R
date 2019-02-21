@@ -1,0 +1,52 @@
+---
+title: "kko_tag"
+author: "201821479_황혜린"
+date: "2018년 11월 20일"
+output: html_document
+---
+
+
+```{r}
+library(rvest)
+library(httr)
+
+tag = NULL
+
+for (i in 1:22) {
+  url <- c("https://careers.kakao.com/jobs?page=")
+  urls <- paste(url, i, sep="")
+  html_source = read_html(urls)
+  
+  tag0 <- html_nodes(html_source, '.link_tag')
+  tag1 <- html_text(tag0)
+  tag <- append(tag, tag1)
+  
+  Jobgroup_tag <- data.frame(tag)
+  
+  Jobgroup_tag[,1] = gsub("[\n\r\t]","",Jobgroup_tag[,1])
+  
+  write.csv(Jobgroup_tag, file = "KKO_Tag.csv")
+}
+
+Tag = Jobgroup_tag$tag
+Tag_ <- unlist(Tag)
+Tag_chr <- as.character(Tag)
+View(Tag_chr)
+
+Tag_dataframe <- data.frame(Tag_chr)
+Tag_table <- table(Tag_dataframe)
+
+library(wordcloud2)
+wordcloud2(data = Tag_table)
+
+#install.packages("wordcloud")
+#require("RColorBrewer")
+
+library(wordcloud)
+library(RColorBrewer)
+wordcloud(names(Tag_table), freq = Tag_table, random.color = T, random.order = F, min.freq = 3, max.words = 50)
+
+
+#installed.packages("dplyr")
+```
+

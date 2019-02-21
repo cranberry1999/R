@@ -1,0 +1,53 @@
+---
+title: "bitcoin"
+author: "201821479_황혜린"
+date: "2018년 11월 21일"
+output: html_document
+---
+
+
+5
+```{r}
+
+headline <- NULL
+date <- NULL
+
+library(rvest)
+
+for (i in 1:5) {
+  url <- ("https://search.daum.net/search?nil_suggest=btn&w=news&DA=PGD&cluster=y&q=%EB%B9%84%ED%8A%B8%EC%BD%94%EC%9D%B8+%EA%B8%89%EB%93%B1&sd=20171111000000&ed=20171216235959&period=u&p=")
+  urls <- paste(url, i, sep = "")
+  html_source <- read_html(urls)
+  
+  h <- html_nodes(html_source, 'a.f_link_b')%>%html_text()
+  headline <- append(headline, h)
+  
+  d <- html_nodes(html_source, 'p.f_eb.desc')%>%html_text()
+  date <- append(date, d)
+  
+  bit <- data.frame(headline, date)
+  
+  bit[,1] <- gsub("[\n\r\t]", "", bit[,1])
+  bit[,2] <- gsub("[\n\r\t]", "", bit[,2])
+  
+  
+}
+
+bit_ <- bit$headline
+library(KoNLP)
+data <- sapply(bit_, extractNoun, USE.NAMES = F)
+
+bit_1 <- unlist(data)
+bit_chr <- as.character(bit_1)
+bit_chr <- Filter(function(x){nchar(x)>1}, bit_chr)
+
+bit_chr <- gsub("비트", "", bit_chr)
+
+bit_df <- data.frame(bit_chr)
+bit_tb <- table(bit_df)
+
+library(wordcloud2)
+wordcloud2(data = bit_tb, minSize = 5)
+
+```
+

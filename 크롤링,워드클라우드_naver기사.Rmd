@@ -1,0 +1,109 @@
+---
+title: "네이버기사크롤링"
+author: "201821479_황혜린"
+date: "2018년 11월 19일"
+output: html_document
+---
+
+# 크롤링 
+```{r}
+library(rvest)
+library(httr)
+
+url <- c("https://news.naver.com/main/ranking/popularDay.nhn?rankingType=popular_day&sectionId=105&date=201811")
+
+title <- NULL
+
+for (i in 01:19) {
+  urls <- paste(url, i, sep="")
+  html_source <- read_html(urls)
+  
+  title0 <- html_nodes(html_source, '.ranking_office')
+  title1 <- html_text(title0)
+  title = append(title, title1)
+  
+}
+
+it_title = data.frame(title)
+
+it_title[,1] = gsub("[\n\r\t]", "", it_title[,1])
+write.csv(it_title, file = "Naver_it.csv")
+
+
+
+```
+
+
+
+# 워드크라우드 
+```{r}
+Naver_it = read.csv("Naver_it.csv", stringsAsFactors = F)
+
+data1 = Naver_it$title
+
+
+#L_data2 = lapply(data1, extractNoun)
+#str(data2)
+#head(str(L_data2), 5)
+#암튼 둘 다 list
+
+#list를 풀어서 길이가 2이상인 단어들만 필터링 
+undata = unlist(data1)
+class(undata) #character
+#undata_5 = head(undata)
+#str(undata_5)
+#> str(undata_5)
+ #chr [1:6] "한국일" "보" "S" "아시아경" "제" "파이낸셜"
+
+undata = Filter(function(x){nchar(x)>1}, undata)
+
+wdata <- data.frame(undata)
+wc <- table(wdata)
+
+
+library(wordcloud2)
+wordcloud2(data = wc, minSize = 10)
+```
+
+
+
+```{r}
+tag = NULL
+
+for (i in 1:22) {
+  url <- c("https://careers.kakao.com/jobs?page=")
+  urls <- paste(url, i, sep="")
+  html_source = read_html(urls)
+  
+  tag0 <- html_nodes(html_source, '.link_tag')
+  tag1 <- html_text(tag0)
+  tag <- append(tag, tag1)
+  
+  Jobgroup_tag <- data.frame(tag)
+  
+  Jobgroup_tag[,1] = gsub("[\n\r\t]","",Jobgroup_tag[,1])
+  
+  write.csv(Jobgroup_tag, file = "KKO_Tag.csv")
+}
+
+Tag = Jobgroup_tag$tag
+Tag_ <- unlist(Tag)
+Tag_chr <- as.character(Tag)
+View(Tag_chr)
+
+Tag_dataframe <- data.frame(Tag_chr)
+Tag_table <- table(Tag_dataframe)
+
+library(wordcloud2)
+wordcloud2(data = Tag_table, minSize = 10)
+```
+
+
+
+
+
+
+
+
+
+
