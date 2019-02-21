@@ -1,0 +1,90 @@
+---
+title: "HW1-1"
+author: "HW1-1_201821479_황혜린"
+date: "2018년 10월 11일"
+output: word_document
+---
+
+```{r}
+
+#첫번째 자료는 customer_data입니다.
+store.df <- read.csv("http://bit.ly/2pPMja5")
+head(store.df,3)   #웹에서 불러오기
+
+
+#컴퓨터에서 불러오기 
+setwd("C:/Users/hyere/Downloads/data")
+cd <- read.csv("customer_data.csv") 
+str(cd)
+
+#빈 칼럼들 삭제
+cd$X<-NULL
+cd$X.1<-NULL
+cd$X.2<-NULL
+cd$X.3<-NULL
+str(cd)
+
+
+#자료의 컬럼들의 연관성을 파악해봅시다!
+#1. 보험사기를 당한 고객 중에서 자산관리사경력(FP경력)이 있는 고객의 수와 비율 
+
+#보험사기를 당한 고객 수 
+nrow(cd[cd$보험사기자여부=="Y",])
+
+
+#보험사기를 당한 고객 중에서 FP경력있는 고객의 수 
+nrow(cd[cd$보험사기자여부=="Y" & cd$FP경력 =="Y",])
+
+#176/1806 = 약 0.1 , 즉 10%정도의 고객이 자산관리를 받았는데 보험사기를 당했다!
+
+
+
+#2. 추정가구소득 1,2 를 합산한 총가구소득 컬럼을 추가
+cd$총가구소득 <- cd$추정가구소득1 + cd$추정가구소득2
+View(cd)
+
+#보험에 가입한 고객중에서 가장 고령인 고객은?
+head(sort(cd$연령,decreasing=T), 1)
+
+
+
+
+#두번째 자료는 경기도지출집행현황 입니다.
+store.df <- read.csv("http://bit.ly/2yev3Ab")
+head(store.df,3)   #웹에서 불러오기
+
+
+#컴퓨터에서 불러오기 
+getwd()
+setwd("C:/Users/hyere/Desktop/PR")
+ge <- read.csv("Geonggi_expense.csv")
+str(ge)
+#빈 칼럼 삭제
+ge$계약대장관리번호 <- NULL
+colnames(ge)
+
+
+#NA 값 0으로 
+ge[is.na(ge)] <- 0
+View(ge)
+  
+
+#지출금액이 높은 순서대로 5개 출력 
+head(sort(ge$지출금액,decreasing=T), 5)
+
+
+#사업자 등록번호의 결측치 개수는?
+nrow(ge[ge$사업자등록번호=="0",])
+
+
+
+#칼럼을 추가해봅시다 
+ge[ge$부서구분명 == "본청", "English"] = "Main_office"
+ge[ge$부서구분명 == "직속기관", "English"] = "Direct_agency"
+ge[ge$부서구분명 == "외청", "English"] = "Exterior"
+ge[ge$부서구분명 == "사업소", "English"] = "Office"
+head(ge)
+
+
+
+```
