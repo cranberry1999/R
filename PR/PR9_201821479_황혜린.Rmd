@@ -1,0 +1,104 @@
+---
+title: "PR9"
+author: 'PR9_201821479_황혜린'
+date: "2018년 11월 16일"
+output: word_document
+---
+
+# 선택한 기사 : https://www.nytimes.com/2018/09/25/learning/whats-going-on-in-this-graph-sept-26-2018.html
+
+## 그림 
+```{r}
+#install.packages("png")
+library(png)
+pic_1 <- readPNG("26WGOITGraphLN2-superJumbo.png")
+dim(pic_1)
+
+pic_2 <- pic_1[,,1]
+image(t(pic_2)[,nrow(pic_2):1], col=gray(seq(0,1,length.out=1200))) 
+#원래 컬러인데 컬러 그대로 가져오는 방법을 못찾아서 흑백으로 코딩하는 점 양해부탁드립니다.
+
+```
+
+• What do you notice?
+
+```{r}
+#이 그래프에서는 큰 박스인 Bank of America가 제일 먼저 보였다. 주식시장에서 $312상당의 주가가치를 갖고 있다고 한다. 그래프를 살피던 중 네모박스들 밑의 작은 글씨들이 눈에 들어왔다. 애플은 1조 달러 이상의 가장 높은 시장가치를 가졌고, 아마존이 1조달러의 문턱을 넘어 그 뒤를 따른다는 내용이었다. 이 작은 글씨를 읽기 전까지 Bank of America가 미국 주식시장에서 가장 높은 가치를 지녔구나 하고 판단했고 위의 숫자 $1,000,000,000,000는 네모박스들의 모든 주가가치를 합친 것인 줄 알았다. 애플과 아마존을 포함한 그래프를 그렸으면 Bank of America보다 3배 이상 큰 박스를 그려야 해서 배제한 것으로 예측된다. 하지만 저 작은 글씨까지 꼼꼼하게 읽지 않고 지나친다면 두 회사가 1조달러 이상의 가치를 지녔다는 중요한 정보를 지나칠 수 있다. 박스 크기가 3배 이상이어도 그래프에 추가했다면, 좋은 정보들을 더 직관적으로 사람들에게 전달할 수 있지 않을까 하는 아쉬움이 남는다. 
+
+#또 다른 아쉬운 점을 언급하자면, 주식 시장에서 같은 성격을 가진 업계끼리 같은 색을 사용해서 박스를 만들었다면 가독성을 높일 수 있을 것 같다. 
+
+#비록 어떤 분야가 주식시장에서 우세한지 파악하기 힘들지만 어떤 기업이 주식시장에서 우세한지는 쉽게 판단이 가능하기 때문에 각 기업이 보유한 주가가치를 박스크기에 빗대어 표현한 것은 나쁜 방법은 아니라고 생각한다.
+
+```
+
+• What do you wonder?
+
+What are you curious about that comes from what you notice in the graph?
+```{r}
+#영화사는 월트 디즈니, 21세기 폭스 그리고 온라인 중개거래 회사는 아마존, 이베이 등 한 분야에서 보통 두 개 이상의 회사가 나타났다. 하지만 내 지식으로 비행기 제조 회사는 Boeing하나만 있는 것으로 일차적으로 판단되고 보잉이 그 시장을 독점했다고 예상된다. 
+
+#만약 보잉이 항공기제조업시장을 독점했다는 것이 사실이라면 독점기업에 투자해 많은 수익을 창출 할 수 있지 않을까? 
+
+#정확한 지식을 알아보기 위해 독점기업에 투자하면 많은 수익을 창출 할 수 있는지 부터 인터넷에서 찾아보았다. “기업의 형태 중 가장 힘이 센 부류는 독점기업이다. 독점기업은 가격결정력을 통해 이윤을 확대할 수 있고 경쟁사를 의식한 마케팅 비용을 축소할 수 있는 장점이 있다.”라는 정보가 워렌버핏의 가치투자 방법에 포함되어 있었다. 따라서 보잉의 독점이 확실하다면 우리는 투자를 통해 수익을 창출할 수 있다. 
+
+#보잉의 경쟁사를 알아보고 그 기업의 가치가 보잉보다 월등히 낮다면 즉, 저 그래프에 포함되어 있지 않다면 보잉은 시장을 독점했다고 말할 수 있다. 
+
+#구글링을 통해 항공기 제조업에서 보잉과 에어버스가 독점을 하고 있다는 사실을 알 수 있었다.하지만 에어버스는 아직 그래프에 없으므로 보잉이 독점시장에서 우위를 차지하고 있으며 투자하면 수익을 창출할 수 있을 것이라 판단하려는 찰나 “유럽 항공기 제조업체 에어버스 연간 항공기 주문 계약 규모가 경쟁사 보잉(NYSE:BA)을 뛰어넘었다고 15일(현지시각) CNBC가 보도했다.” – 2018.1.16 출처 : http://news.chosun.com/site/data/html_dir/2018/01/16/2018011602184.html 는 다소 자극적인 정보를 알 수 있었다. 에어버스가 바짝 추격해오고 있으므로 보잉과 에어버스에 분산투자 하는 것이 더 나을 수도 있겠다. 하지만 현재로서는 보잉에 투자하는 것은 나쁘지 않아 보인다.
+
+
+#추가로 우리나라의 주가시장 정보를 가져와 비슷하게 그래프를 그려보면 어떤 결과가 나올지 궁금하다. 저 그래프와 비교해봐도 재밌을 것 같다. 예측해보자면 삼성, LG의 박스가 제일 크고 그 뒤로 SK, 현대, KAKAO, NAVER 등이 있을 것 같다. 
+
+```
+
+
+• What might be going on in this graph?
+
+Write a catchy headline that captures the graph’s main idea. If your headline makes a claim, tell us what you noticed that supports your claim.
+```{r}
+#내가 생각하는 헤드라인은 “주가가치 $1,000,000,000,000를 꿈꾸는 네모박스들”이다. 그래프 위에$1,000,000,000,000이 크게 적혀 있고 주가가치 $1,000,000,000,000을 넘긴 애플과 아마존은 박스를 만들지 않은 것을 감안하였다.
+
+#그리고 내가 정의하는 기업의 목표는 높은 가치를 창출하여 성장해가는 것이다. 따라서 주가가치 1조 달러 문턱을 넘는 것은 모든 기업이 가지고 있는 꿈이라고 생각해 “주가가치 $1,000,000,000,000를 꿈꾸는 네모박스들” 을 헤드라인으로 정하였다.
+
+```
+
+2. Next, join the conversation by clicking on the comment button and posting in the box that opens on the right.
+
+3. After you have posted, read what others have said, then respond to someone else by posting a comment. Use the “Reply” button or the @ symbol to address that student directly.
+```{r}
+#2.comment
+#I noticed that only Boeing is on this graph in Aircraft manufacturing market-section. Then, I think "Boeing" monopolize the market.  What do you think about this?
+
+#3.reply
+#@Agustin Cortez ;I agree. It would be better that Apple's box is added.
+```
+
+Here are some questions you may want to think about critically.
+
+■ Notice the squares for Bank of America and Disney and then look at their stock market values. Now, do the same for Disney and Ford. The graph states, “Squares for these 27 companies are sized according to each company’s stock market value as of August 2.” Explain how they are proportionately sized.
+```{r}
+#이 문제를 처음 봤을 때 든 생각은 '기 기사를 작성했던 시기와 현재의 주가가치는 다를텐데'였다. 그래서 최대한 비슷한 시기로 찾아보았다.
+#시가총액이 
+#Bank of America 313.5
+#디즈니 152.1
+#포드 36 (단위:B)
+#각 기업의 시가총액에 비례하여 박스크기를 설정한 것으로 판단된다. 
+
+```
+
+■ Notice the size of the squares that have values and those that don’t. What do you think is the range of values for non-labeled squares? Explain your answer.
+```{r}
+#박스에 적힌 시가총액중에서 가장 낮은 숫자는 $16B이다. 내 생각에는 1.시가총액 $16B로 기업의 가치를 나누었거나, 2. 시가총액$16B이하인 기업들은 주가가치 변동이 심해서 non-labeled한 것 같다.
+```
+
+■ Do you or a friend use an Apple product — iTunes, or an iPhone or MacBook, for example? What do you think has made Apple so successful? Likewise, in your opinion, what has made Amazon so successful? Which other companies do you think will be the next to top $1 trillion? Explain your choices.
+```{r}
+#Apple
+#나는 아이팟이 우리나라에 상륙했을 때부터 아이팟터치를 시작으로 아이패드 아이폰을 써오는 애플 유저로서 생각하건데 애플은 자사제품을 사고싶게 만드는 재주가 있다. 이른바 호갱이라는 용어가 등장할 정도로 비싼가격에 제품을 출시해도 유저들은 산다. 
+#예전에 스티브잡스의 책에서 읽고 기억에 남는 부분이 있다. 맥북을 처음 만들었을 때 스티브잡스와 기술팀은 자주 부딪혔는데, 맥북의 발열을 조절하는 팬(?)을 빼라는 스티브잡스의 무리한 요구때문이었다. 그 이유는 "팬을 넣으면 안예쁘니까"였다. 
+#그러한 스티브잡스의 고객맞춤 경영철학은 시대에 잘 들어맞았고 애플디자인=아이덴티티가 되어 승승장구하고있다.
+
+#amazone
+#데이터 사이언스수업시간에 이런 내용을 배웠다. 아마존이 데이터사이언스를 활용하는 목적은 고객이 어떤 물건을 살 지 예측해서 그 지역 창고에 미리 가져다 놓는 것이다. 빅데이터와 딥러닝이 도래했던 시기에 아마존의 선견지명으로 데이터분석을 시작했던 것은 현재 아마존이 존재하는 이유중 하나라고 생각한다.
+
+#Google. 구글이 이 그래프에 없다는 사실에 놀랐다. 현대 시가총액 $741B로 곧 $1T를 돌파 할 것 같다.
+```

@@ -1,0 +1,214 @@
+---
+title: "PR4"
+author: "PR4_201821479_황혜린"
+date: "2018년 10월 4일"
+output: word_document
+---
+
+# Dataframe
+
+## 1.벡터를 이용해 데이터프레임 만들기 
+```{r}
+name <- c("Boil","Tom","Ravindra","Bob","Sobia")
+gender <- c("M","M","F","M","F")
+age <- c(17,21,33,12,37)
+marriage <- c(F,T,F,F,T)
+
+customer <- data.frame(name,gender,age,marriage)
+str(customer)
+
+customer <- data.frame(name,gender,age,marriage, stringsAsFactors = F)
+str(customer)
+
+str(customer)
+
+names(customer)
+
+rownames(customer)
+```
+
+## 2. Data Frame 변수명 바꾸기  
+```{r}
+colnames(customer)
+rownames(customer)
+
+colnames(customer) <- c("cust_name","cust_gend","cust_age","cust_mrg")
+rownames(customer) <- c('a', 'b', 'c', 'd', 'e')
+customer
+```
+
+## 3. Data Frame 데이터 추출
+```{r}
+customer[1,] ; customer["a",]
+
+customer[customer$cust_name=="Tom",]
+
+customer[2:5,] ; customer[-1,]
+
+customer[customer$cust_name!="Tom",]
+
+customer[c("b","c"),]
+```
+
+## 4. Data Frame에 데이터 추가
+```{r}
+customer$cust_height <- c("185","165","156","174","155")
+customer["f",] <- list("Jack","M",50,T,"167")
+customer
+
+customer <- cbind(customer,weight=c(80,70,65,48,55,100))
+customer <- rbind(customer,g=list("Merry","F",42,F,"172",60))
+customer<- rbind(customer,h=c("Merry","F",42,F,"172",60))
+customer
+```
+
+## 5. Data Frame 에 데이터 삭제 
+```{r}
+customer<-customer[,-5]
+customer<-customer[-7,]
+customer$weight<-NULL
+```
+
+## 6. Data 조건문을 활용해 조작하기
+```{r}
+customer[customer$cust_gend=="M",] #cust_gend칼럼이 M인row만 출력 
+
+customer[customer$cust_gend!="F",] #cust_gend칼럼이 F가 아닌 row
+
+nrow(customer[customer$cust_gend=="M",]) #행의 개수
+
+customer[customer$cust_name=="Bob", c("cust_age","cust_mrg")] #cust_name컬럼 중에서 Bob의 cust_age,cust_mrg만 출력
+
+customer[customer$cust_name=="Tom" | customer$cust_name=="Ravindra",] #customer컬럼중에서 Tom과 Ravindra만 출력
+
+customer[customer$cust_gend=="M" & customer$cust_age>24,] #cust_gend컬럼 중에서 M을 나타내고, cust_age컬럼 중에서 24세 초과인 row출력 
+```
+
+## 7. Data Frame 정렬하기 
+```{r}
+order(customer$cust_age)
+
+customer[order(customer$cust_age),]
+
+order(customer$cust_age, decreasing=F)
+
+customer[order(customer$cust_age, decreasing=F),]
+```
+
+## 8. Data frame 기타 함수
+```{r}
+head(customer)
+
+head(customer, 2)
+
+tail(customer, 2)
+```
+
+# 파일 입출력
+## 1. 내장데이터 불러오기 
+```{r}
+library(MASS)
+head(iris)
+str(iris)
+
+head(mtcars)
+str(mtcars)
+
+head(USArrests)
+str(USArrests)
+```
+
+## 2. file로 저장된 데이터 불러오기 
+```{r}
+setwd("C:/Users/hyere/Desktop/PR")
+csv<-read.csv("read_csv.csv") ; csv
+
+str(csv)
+getwd()
+
+csv2 = read.csv("read_csv.csv", header=F, stringsAsFactors=F) ; csv2
+str(csv2)
+
+csv3 = read.csv("csv_NA.csv", header=F, stringsAsFactors=F, na.strings=c(".","N.A.","")) ; csv3
+str(csv3)
+
+csv4 = read.csv("csv_NA.csv", header=F, stringsAsFactors=F, encoding="UTF-8") ; csv4
+str(csv4)
+
+table = read.table("read_csv.csv", header=F,sep=",", stringsAsFactors=F)
+table
+```
+
+## 3. 웹에서 데이터 읽어오기 
+```{r}
+store.df <- read.csv("http://goo.gl/QPDdMl")
+head(store.df,2)
+
+library(XML)
+world_pop = readHTMLTable("http://www.worldometers.info/world-population/")
+head(world_pop[[1]])
+```
+
+## 4. 데이터 저장하기 
+```{r}
+table
+
+write.table(table,"PR_table.csv")
+write.table(table,"PR_table1.csv",row.names=F)
+write.csv(table,"PR_table2.csv",row.names=F)
+```
+
+# 연습문제 
+
+# 문제1
+```{r}
+setwd("C:/Users/hyere/Desktop/PR")
+pubg <- read.csv("PUBG_Player_Statistics.csv") ; csv
+
+str(pubg)  #문제 1.1
+
+#문제 1.2) 엑셀파일 solo_AvgSurvivalTime, solo_MoveDistance의 숫자들에 ,(콤마)와 빈 값(-)있어 str()을 실행 할 때 숫자가 아닌 문자로 인식하여 제대로 출력되지 않습니다.
+
+
+#문제1.3) 첫번째로는 엑셀파일 solo_AvgSurvivalTime, solo_MoveDistance의 숫자들에 콤마를 지워야 합니다. 또한, solo_MoveDistance의 경우에는 빈 값 까지 제거해주어야합니다.
+#두번째로는 컬럼player_name은 factor->charactor로, 컬럼 solo_AvgSurvivalTime, solo_MoveDistance 는 factor->int으로, play_region는 int->factor로 전환해주어야 합니다.
+
+
+pubg1 <- read.csv("PUBG_Player_Statistics_fix.csv")
+#수정한 엑셀파일을 pubg1에 지정
+
+pubg1$player_name <- as.character(pubg1$player_name)
+pubg1$solo_AvgSurvivalTime <- as.integer(pubg1$solo_AvgSurvivalTime)
+pubg1$solo_MoveDistance <- as.integer(pubg1$solo_MoveDistance)
+pubg1$play_region <- as.factor(pubg1$play_region)
+#자료형을 변환해 주는 과정
+str(pubg1)
+
+```
+
+# 문제2
+```{r}
+#play_region의 각각 값에 대응하는 country를 입력합니다.
+pubg1[pubg1$play_region == "1", "Country"] = "KOREA"
+pubg1[pubg1$play_region == "2", "Country"] = "CHINA"
+pubg1[pubg1$play_region == "3", "Country"] = "JAPAN"
+pubg1[pubg1$play_region == "4", "Country"] = "USA"
+pubg1[pubg1$play_region == "5", "Country"] = "OTHERS"
+
+head(pubg1, 15) #확인
+```
+
+# 문제3 
+```{r}
+Avgdmg <- tapply(pubg1$solo_AvgDamage, pubg1$Country, mean)
+#Avgdmg 라는 변수에 국가별 평균 데미지를 할당합니다
+
+Avgkills <- tapply(pubg1$solo_AvgKills, pubg1$Country, mean)
+#Avgkills라는 변수에 국가별 평균 킬수를 할당합니다
+
+ranking <- Avgkills * 0.4 + Avgdmg * 0.6
+#Avgdmg, Avgkills에 각각 가중치를 두어 ranking이란 변수에 할당합니다
+
+sort(ranking, decreasing=T)
+#ranking이 높은 순서대로 출력합니다
+```

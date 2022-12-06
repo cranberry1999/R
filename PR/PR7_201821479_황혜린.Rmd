@@ -1,0 +1,245 @@
+---
+title: "PR7"
+author: "PR7_201821479_황혜린"
+date: "2018년 11월 1일"
+output: word_document
+---
+
+# apply함수
+- 복수의 데이터에 함수를 일괄 적용할 때 사용
+- apply,lapply,sapply,tapply,mapply 등이 있음
+- 각 apply함수는 입력받는 데이터의 형태와 출력하는 데이터의 형태에 따라 다르게 적용함 
+
+## 1)apply 함수
+- 형식 : apply(data,margin(1또는2),function)
+- margin 인수를 1또는 2로 사용하며 1은 행,2는 열을 적용
+- 행이나 열의 합계, 평균등을 일괄적으로 구할수 있음
+```{r}
+head(mtcars,1)
+apply(mtcars[1:3,], 1, FUN = mean)
+apply(mtcars[,1:3], 2, FUN = mean)
+```
+
+## 2)lapply(list apply)
+- 형식 : apply(data,function)
+- 리스트형의 데이터를 받아 리스트로 결과를 반환
+- 데이터프레임의 각 열은 리스트로 구성되어 있음
+```{r}
+lapply(mtcars[,1:3], mean)
+```
+
+## 3)sapply(simple apply)
+- 형식 : function(data, function, simplify=F)
+- 입력값 : 벡터, 리스트, 데이터프레임 가능 
+- 출력값 : 벡터, 리스트, 매트릭스 형태로 결과를 반환 
+- 인수 simplify=F이면 리스트로 결과 반환 
+```{r}
+x = 1:5 ; y = 11:14
+z = list(x,y)
+sapply(x,function(x){x+1})
+
+sapply(z,function(x){x+1})
+
+sapply(mtcars[1:3,],function(x){x+1})
+
+sapply(mtcars[1:3,],function(x){x+1}, simplify = F)
+```
+
+## 4)tapply(table apply)
+- 그룹으로 묶은 후 함수를 적용, 적용값을 벡터나 행렬로 반환 
+```{r}
+patient <- read.table("simple_data.txt", header = TRUE)
+factor(patient$type)
+
+tapply(patient$type,patient$type,length)
+tapply(patient$age,patient$type,mean)
+
+```
+
+## 5)mapply(multi simple apply)
+- 여러개의 리스트에 함수를 적용
+```{r}
+m1 <- list(a = c(1:10), b = c(11:20))
+m2 <- list(c = c(21:30), d = c(31:40))
+mapply(sum, m1$a, m2$d)
+mapply(sum, m1$a, m1$b, m2$c, m2$d)
+```
+
+## 6)aggregating
+- 예제데이터
+```{r}
+seg.df <- read.csv("http://goo.gl/qw303p")
+head(seg.df)
+```
+
+## 6.1)mean, sd 통계함수
+```{r}
+attach(seg.df)
+mean(income[Segment == "Moving up"])
+mean(income[Segment == "Moving up" & subscribe == "subNo"])
+
+```
+
+## 6.2)apply 함수
+```{r}
+apply(seg.df[,c(1,3,4)], 2, mean)
+str(apply(seg.df[,c(1,3,4)], 2, mean))
+apply(seg.df[Segment == "Moving up", c(1,3,4)], 2, mean)
+```
+
+## 6.3)table 함수
+```{r}
+table(kids)
+table(ownHome, subscribe)
+table(Segment, kids, subscribe)
+```
+
+## 6.4)함수
+- 사용방식 : by(목표변수, 기준변수, 함수)
+- by함수는 결과 값을 리스트로 반환한다 
+```{r}
+by(income, Segment, mean)
+by(income, list(Segment, subscribe), mean)
+```
+
+## 6.5)aggregate 함수
+- 사용방식 : aggregate(목표변수,기준변수,함수)
+- 결과값을 데이터프레임으로 출력해주는 것이 가장 큰 장점임
+- 기준변수가 list입력되어야한다
+```{r}
+aggregate(income, list(Segment), mean)
+str(aggregate(income, list(Segment), mean))
+aggregate(income ~ Segment, data = seg.df, mean)
+
+aggregate(income~Segment+ownHome+subscribe, data = seg.df, mean)
+```
+
+## 6.6)cut함수 
+- cut함수는 연속형 변수를 특정 구간으로 구분하여 명목형 변수로 반환한다 
+- cut(데이터,breaks=구간수, lable=구간이름)
+```{r}
+cut.data = aggregate(income ~ Segment + ownHome + subscribe, data = seg.df, mean)
+cut.data$income2 = cut(cut.data$income, breaks = seq(0, 70000, 10000))
+cut.data$income2 = cut(cut.data$income, breaks = c(0, 20000, 30000, 40000, 50000, 60000, 70000), 
+labels = c('2만이하', '2만~3만', '3만~4만', '4만~5만', '5만~6만', '6만이상'))
+cut.data
+```
+
+## 6.7)grep 함수
+```{r}
+grep("ap", c("apple", "Apple", "apple2", "bbapple"))
+grep("ap", c("apple", "Apple", "apple2", "bbapple"), value = TRUE)
+grep("[1-3]", c("apple1", "apple2", "apple3", "apple4", "Apple1"))
+grepl("ap", c("apple", "Apple", "apple2", "bbapple"))
+
+seg.df$ownHome = as.character(seg.df$ownHome)
+grep('Yes', seg.df$ownHome)
+head(seg.df)
+seg.df$ownHome[grep('Yes', seg.df$ownHome)] = 'Yes'
+head(seg.df)
+```
+
+## 6.8)gsub 함수
+- 현재데이터의 Segment컬럼에 한 칸 띄어쓰기를 없애고 싶을때, 다음과 같이 사용한다 
+```{r}
+seg.df$Segment = gsub(" ", "", seg.df$Segment)
+head(seg.df)
+```
+
+## 6.9)which(), which.max(), which.min()
+```{r}
+x <- c(2,4,6,7,10)
+x %% 2
+which(x %% 2 == 0)
+x[which(x %% 2 == 0)]
+x <- c(2,4,6,7,10)
+which.min(x)
+x[which.min(x)]
+which.max(x)
+x[which.max(x)]
+```
+
+# package
+- R에서 기본적으로 제공하는 함수 외에 다른 프로그래머들이 필요하다고 생각해서 만들어놓은 함수들의 모음
+-이것을 보통 library 또는 API라고 칭함
+- R에서는 보통 CRAN에서 R재단이 인정한 패키지들을 공유 
+- 비공식적이지만 개인이 만들어서 공유하는 패키지들이 있는데 보통 github에 업로드 되어 있음
+
+## 설치
+- 설치 명령어:install.packages()
+- 다음 시간 사용할 크롤링 관련 패키지 설치
+```{r}
+#install.packages("rvest")
+#install.packages("httr")
+#install.packages("Rselenium")
+```
+
+## 불러오기
+- library(package 이름): 설치되어 있는 패키지를 불러옴 
+- require(package 이름): 불러오려시 시도를 하고 logical한 return값을 반환 
+```{r}
+x <- library(rvest)
+x
+x <- require(rvest)
+x
+```
+
+## 패키지 업데이트
+- 패키지 개발자가 자신이 만든 패키지의 기능을 보완하거나, R버전이 업데이트되어서 호환이 되게 수정하거나 오류사항을 수정
+- 명령어는 update.package(패키지이름)
+- R studio를 쓰시는 경우에는 우측 하단에 pakages라는 탭이 보이는데, 해당 탭 바로 밑에 update라는 항목이 보일겁니다 
+- 이걸 누르고 원하는 패키지 또는 전체 패키지를 선택하고 업데이트 눌러주시면 됩니다 
+```{r}
+#update.packages("rvest")
+```
+
+## 비공식 패키지 설치
+```{r}
+#install.packages("devtools")
+library(devtools)
+#install_github("패키지")
+```
+
+## 불러온 패키지 사용중지
+```{r}
+#detach("package:ggplot2",unload = T)
+```
+
+## 연습문제1
+```{r}
+setwd("C:/Users/hyere/Desktop/PR")
+pubg <- read.csv("PUBG_Player_Statistics.csv") 
+
+pubg[,5:6] <- sapply(pubg[,5:6], function(x){gsub(",","",x)})  #sapply안에 gsub함수를 사용해서 ,를 없앱니다 
+pubg[,6] <- sapply(pubg[,6], function(x){gsub(" ","",x)})
+#같은 방법으로 공백을 없앱니다 
+head(pubg)
+```
+
+## 연습문제2
+```{r}
+
+#PR4_문제3번
+#변수에 국가별 평균 데미지와 킬수를 각각 한번에 할당할 수 있는 tapply를 적용하면 쉽게 풀 수 있습니다.
+
+setwd("C:/Users/hyere/Desktop/PR")
+pubg1 <- read.csv("PUBG_Player_Statistics_fix.csv")
+pubg1[pubg1$play_region == "1", "Country"] = "KOREA"
+pubg1[pubg1$play_region == "2", "Country"] = "CHINA"
+pubg1[pubg1$play_region == "3", "Country"] = "JAPAN"
+pubg1[pubg1$play_region == "4", "Country"] = "USA"
+pubg1[pubg1$play_region == "5", "Country"] = "OTHERS"
+
+Avgdmg <- tapply(pubg1$solo_AvgDamage, pubg1$Country, mean)
+#Avgdmg 라는 변수에 국가별 평균 데미지를 할당합니다
+
+Avgkills <- tapply(pubg1$solo_AvgKills, pubg1$Country, mean)
+#Avgkills라는 변수에 국가별 평균 킬수를 할당합니다
+
+ranking <- Avgkills * 0.4 + Avgdmg * 0.6
+#Avgdmg, Avgkills에 각각 가중치를 두어 ranking이란 변수에 할당합니다
+
+sort(ranking, decreasing=T)
+#ranking이 높은 순서대로 출력합니다
+```
+
