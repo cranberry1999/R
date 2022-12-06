@@ -1,0 +1,106 @@
+---
+title: "DataScience"
+author: "201821479_황혜린"
+date: "2018년 11월 28일"
+output: html_document
+---
+
+```{r}
+?"::"
+
+#install.packages("data.table") 디폴트로 data.table클래스의 객체를 리턴하기 때문에 data.table=F옵션을 사용하면 data.frame으로 반환된다. 
+
+library(dplyr)
+i2 <- tbl_df(iris)  #이 함수는 큰 데이터를 출력할 때 스크롤 압박에서 벗어나게 해준다 
+class(i2)
+i2
+
+glimpse(i2)
+#Observations: 150
+#Variables: 5
+#$ Sepal.Length <dbl> 5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9, 5.4, 4.8, 4.8, 4.3, 5.8, 5.7, 5.4, 5...
+#$ Sepal.Width  <dbl> 3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3...
+#$ Petal.Length <dbl> 1.4, 1.4, 1.3, 1.5, 1.4, 1.7, 1.4, 1.5, 1.4, 1.5, 1.5, 1.6, 1.4, 1.1, 1.2, 1.5, 1.3, 1...
+#$ Petal.Width  <dbl> 0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0...
+#$ Species      <fct> setosa, setosa, setosa, setosa, setosa, setosa, setosa, setosa, setosa, setosa, setosa...
+
+str(i2)
+#Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	150 obs. of  5 variables:
+# $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+# $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+# $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+# $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+# $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
+
+str(iris)
+#'data.frame':	150 obs. of  5 variables:
+# $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+# $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+# $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+# $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+# $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
+
+iris %>% str #위와 같다 
+iris %>% head()
+iris %>% head(10)
+
+```
+
+# dplyr
+```{r}
+#filter 
+
+#install.packages("gapminder")
+library(gapminder)
+filter(gapminder, country=='Korea, Rep.')
+filter(gapminder, year==2007)
+filter(gapminder, country=='Korea, Rep.' & year==2007)
+
+gapminder %>% filter(country == 'Korea, Rep.')
+gapminder %>% filter(country == 'Korea, Rep.', year==2007)
+gapminder %>% filter()
+
+#arrange -오름차순으로 행 정렬  (역은-;내림차순)
+gapminder %>% arrange(year)
+
+#select 열을 선택 
+gapminder %>% select(country, pop, gdpPercap)  #select함수 안에 입역한 순서대로 출력된다! 과학적이다. 
+
+#mutate 변수를 변환  ; 겁나 간단함 ..
+gapminder %>% mutate(total_gdp = pop*gdpPercap) #데이터프레임에 저장되지는 않는것같다:
+gapminder[,7] <- NULL
+
+#summarize 요약통계량을 계산 
+gapminder %>% summarise(n_obs = n(), n_country = n_distinct(country), med_gdpc = median(gdpPercap))
+
+#distinct 함수의 고유한 행을 찾아냄 
+gapminder %>% select(country) %>% distinct()
+gapminder %>% select(year) %>% distinct()
+
+#group_by를 이용한 그룹연산 
+
+#각 대륙별 기대수명의 중앙값 
+gapminder %>% filter(year==2007) %>% group_by(continent) %>% summarise(median(lifeExp))
+gapminder %>% filter(year==2007)
+
+#join
+df1 <- data_frame(x = c(1, 2), y = 2:1) ;df1
+df2 <- data_frame(x=c(1,3), a=10, b="a") ; df2
+
+gapminder[, c('lifeExp', 'gdpPercap')]
+gapminder %>% select(lifeExp, gdpPercap)
+
+summary(gapminder$lifeExp)
+summary(gapminder$gdpPercap)
+gapminder %>% select(lifeExp, gdpPercap) %>% cor()
+#            lifeExp gdpPercap
+#lifeExp   1.0000000 0.5837062
+#gdpPercap 0.5837062 1.0000000
+
+cor(gapminder$lifeExp, gapminder$gdpPercap)
+#[1] 0.5837062
+
+
+```
+
+

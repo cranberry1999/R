@@ -1,0 +1,146 @@
+---
+title: "HW1-2"
+author: "HW1-2_201821479_황혜린"
+date: "2018년 10월 12일"
+output: word_document
+---
+
+# 문제1
+```{r}
+setwd("C:/Users/hyere/Desktop/PR")
+vd <- read.csv("virtualData.csv", header = F, na.strings = "") 
+#컬럼이름 없이 1행부터 데이터가 들어있기 때문에 header = F를 해줍니다  
+str(vd)
+
+rownames(vd)
+
+rownames(vd) <- c('김우동', '박수박', '이족발', '홍라면', '박보쌈', '김피자', '장감바스', '백된장', '이초밥', '송돈까스')
+#행 이름을 의원들이 이름으로 수정 
+
+vd$V1 <- NULL
+#첫 번째 열 제거
+str(vd)
+
+```
+
+# 문제2
+```{r}
+setwd("C:/Users/hyere/Desktop/PR")
+vd2 <- read.csv("virtualData.csv", header = F, na.strings = "", stringsAsFactors = FALSE)
+
+vd2[is.na(vd2)] <- 0 #결측치를 0으로 
+
+gsub("찬성", 1, vd2$V3)
+#gsub를 사용하여도 벡터값을 변환할 수 있지만 v3-v10까지 8개의 열을 하나하나 지정해야 한다는 불편함이 있습니다
+
+#따라서 sapply라는 함수를 사용하면 편리하게 벡터값을 변환 할 수 있습니다
+vd2 <- as.data.frame(sapply(vd2, function(vd2) gsub("찬성", 1, vd2)))
+vd2 <- as.data.frame(sapply(vd2, function(vd2) gsub("반대", -1, vd2)))
+vd2 <- as.data.frame(sapply(vd2, function(vd2) gsub("기권", 0, vd2)))
+
+```
+
+# 문제3
+```{r}
+#당은 필요가 없으므로 제거합니다
+vd2$V1 <- NULL
+vd2$V2 <- NULL
+
+rownames(vd2) <- c('이족발', '박보쌈', '김피자', '백된장', '송돈까스', '장감바스', '김우동', '박수박', '홍라면', '이초밥')
+
+#계산을 위해서 데이터프레임의 변수들을 factor에서 num으로 변환해줍니다
+vd2$V3<-as.numeric(as.character(vd2$V3))
+vd2$V4<-as.numeric(as.character(vd2$V4))
+vd2$V5<-as.numeric(as.character(vd2$V5))
+vd2$V6<-as.numeric(as.character(vd2$V6))
+vd2$V7<-as.numeric(as.character(vd2$V7))
+vd2$V8<-as.numeric(as.character(vd2$V8))
+vd2$V9<-as.numeric(as.character(vd2$V9))
+vd2$V10<-as.numeric(as.character(vd2$V10))
+str(vd2)
+
+#vd3 데이터프래임을 만듭니다 
+setwd("C:/Users/hyere/Desktop/PR")
+vd3 <- read.csv("virtualData.csv", header = F, na.strings = "", stringsAsFactors = FALSE)
+vd3$V1 <- NA
+vd3$V2 <- NA
+vd3$V3 <- NA
+vd3$V4 <- NA
+vd3$V5 <- NA
+vd3$V6 <- NA
+vd3$V7 <- NA
+vd3$V8 <- NA
+vd3$V9 <- NA
+vd3$V10 <- NA
+rownames(vd3) <- c('이족발', '박보쌈', '김피자', '백된장', '송돈까스', '장감바스', '김우동', '박수박', '홍라면', '이초밥')
+colnames(vd3) <- c('이족발', '박보쌈', '김피자', '백된장', '송돈까스', '장감바스', '김우동', '박수박', '홍라면', '이초밥')
+
+
+#2중 for문을 사용하여 내적을 구합니다
+x <- 1:10
+y <- 1:10
+for (i in x) {
+  for (j in y) {
+    vd3[i,j] <- sum(vd2[i,] * vd2[j,])
+    
+  }
+}
+str(vd3)
+
+```
+
+# 문제4
+```{r}
+#내적값은 -6~8 까지 분포하고있다. 내적값 8을 가지는 경우일 때 두 의원간의 표결이 가장 비슷하고, 내적값 -6일 때 표결에 가장 차이가 있습니다.
+```
+
+# 문제5 
+```{r}
+#평균 데이터프레임
+setwd("C:/Users/hyere/Desktop/PR")
+vd4 <- read.csv("virtualData.csv", header = F, na.strings = "", stringsAsFactors = FALSE)
+vd4$V1 <- NA
+vd4$V2 <- NA
+vd4$V3 <- NA
+vd4$V4 <- NA
+vd4$V5 <- NA
+vd4$V6 <- NA
+vd4$V7 <- NA
+vd4$V8 <- NA
+vd4$V9 <- NULL
+vd4$V10 <- NULL
+
+rownames(x) <- NULL
+vd4 <- vd4[-c(5,6,7,8,9,10),]
+
+#행에 이름 부여 
+rownames(vd4) <- c('일식우리당', '과일천하당', '야식한국당', '호화양식당')
+
+
+#for문을 사용하여 평균을 구합니다
+x <- 1:8
+for (i in x) {
+  vd4[1,x] <- (vd2[1,] + vd2[4,] + vd2[9,] + vd2[10,])/4
+    
+}
+x <- 1:8
+for (i in x) {
+  vd4[2,x] <- (vd2[2,])/1
+    
+}
+
+x <- 1:8
+for (i in x) {
+  vd4[3,x] <- (vd2[3,] + vd2[5,] + vd2[8,])/3
+    
+}
+
+x <- 1:8
+for (i in x) {
+  vd4[4,x] <- (vd2[6,] + vd2[7,])/2
+    
+}
+
+str(vd4)
+
+```

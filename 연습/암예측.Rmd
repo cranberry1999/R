@@ -1,0 +1,183 @@
+---
+title: "breast_cancer"
+author: "201821479_황혜린"
+date: "2018년 11월 30일"
+output: html_document
+---
+
+# CONTENTS
+## 
+
+
+
+# 0. 사용할 함수들 
+## 이항 오차 함수, 그리고 panel.cor 함수를 정의
+```{r}
+binomial_deviance <- function(y_obs, yhat){
+  epsilon = 0.0001
+  yhat = ifelse(yhat < epsilon, epsilon, yhat)
+  yhat = ifelse(yhat > 1-epsilon, 1-epsilon, yhat)
+  a = ifelse(y_obs==0, 0, y_obs * log(y_obs/yhat))
+  b = ifelse(y_obs==1, 0, (1-y_obs) * log((1-y_obs)/(1-yhat)))
+  return(2*sum(a + b))
+}
+
+
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...){
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits = digits)[1]
+  txt <- paste0(prefix, txt)
+  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+```
+
+# 작업환경 설정, 원본 데이터 불러오기  
+```{r}
+#install.packages(c("glmnet", "randomForest", "gbm", "rpart", "boot", "ROCR", "gridExtra"))
+#install.packages("DT")
+#install.packages("descr")
+
+library(DT)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(MASS)
+library(glmnet)
+library(randomForest)
+library(gbm)
+library(rpart)
+library(boot)
+library(data.table)
+library(ROCR)
+library(gridExtra)
+
+
+
+# 데이터 불러오기, 변수명 할당 
+setwd("C:/Users/hyere/Desktop/R/CSVdata")
+
+data <- tbl_df(read.table("wisc_bc_data.csv", strip.white = TRUE, sep=",", header = FALSE))
+
+feature_names <- c('radius', 'texture', 'perimeter', 'area', 'smoothness',
+                   'compactness', 'concavity', 'concave_points', 'symmetry', 'fractal_dim')
+
+names(data) <-
+  c('id', 'class',
+    paste0('mean_', feature_names),
+    paste0('se_', feature_names),
+    paste0('worst_', feature_names))
+
+```
+
+# 간단한 원본데이터 확인 
+```{r}
+glimpse(data)
+
+#기초통계량
+summary(data)
+```
+
+
+# 데이터 전처리 
+```{r}
+#id변수 제거 (분석에 크게 영향을 미치지 않으므로)
+data <- data %>% dplyr::select(-id)
+
+glimpse(data$class)
+#class 변수를 인자변수로 반환 
+data$class <- factor(ifelse(data$class == 'B', 0, 1))
+
+
+#전처리 후 데이터 확인 
+glimpse(data)
+
+DT::datatable(data)
+```
+
+# 탐색적 데이터 분석(EDA), 데이터 시각화 
+
+## 목적변수인 class의 빈도수 확인 
+```{r}
+descr::CrossTable(data$class)
+
+data %>% ggplot(aes(class)) + geom_bar()
+#악성-> 1=암 
+```
+-이항분류분석 (0or1)
+
+```{r}
+
+```
+
+# 분류분석 
+
+## 수량형 변수들간의 관계를 산점도 행렬로 살펴본다 
+```{r}
+pairs(data %>% dplyr::select(class, starts_with('mean_')) %>% sample_n(min(1000, nrow(data))), 
+      lower.panel = function(x,y){points(x,y); abline(0, 1, col="red")},
+      upper.panel = panel.cor)
+
+```
+
+```{r}
+pairs(data %>% dplyr::select(class, starts_with('se_')) %>%
+        sample_n(min(1000, nrow(data))),
+      lower.panel=function(x,y){ points(x,y); abline(0, 1, col='red')},
+      upper.panel = panel.cor)
+```
+
+```{r}
+pairs(data %>% dplyr::select(class, starts_with('worst_')) %>%
+        sample_n(min(1000, nrow(data))),
+      lower.panel=function(x,y){ points(x,y); abline(0, 1, col='red')},
+      upper.panel = panel.cor)
+
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+p1 <- data %>% ggplot(aes(class)) + geom_bar()
+p2 <- data %>% ggplot(aes(class, mean_concave_points)) +
+  geom_jitter(col='gray') +
+  geom_boxplot(alpha=.5)
+p3 <- data %>% ggplot(aes(class, mean_radius)) +
+  geom_jitter(col='gray') +
+  geom_boxplot(alpha=.5)
+p4 <- data %>% ggplot(aes(mean_concave_points, mean_radius)) +
+  geom_jitter(col='gray') + geom_smooth()
+grid.arrange(p1, p2, p3, p4, ncol=2)
+```
+
+```{r}
+# 트래인셋과 테스트셋의 구분
+set.seed(1606)
+n <- nrow(data) #행 개수 
+idx <- 1:n
+training_idx <- sample(idx, n * .60)
+idx <- setdiff(idx, training_idx)
+validate_idx <- sample(idx, n * .20)
+test_idx <- setdiff(idx, validate_idx)
+training <- data[training_idx,]
+validation <- data[validate_idx,]
+test <- data[test_idx,]
+```
+
+# 로지스틱 회귀분석 
+```{r}
+# 로지스틱 회귀모형
+data_lm_full <- glm(class ~ ., data=training, family=binomial)
+summary(data_lm_full)
+
+predict(data_lm_full, newdata = data[1:5,], type='response')
+
+```
+
+# 모형평가 
+```{r}
+
+```

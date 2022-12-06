@@ -1,0 +1,14 @@
+---
+title: "test_부동산매매"
+author: "11/12일"
+date: "2018년 11월 15일"
+output: html_document
+---
+
+```{r}
+library(rvest)
+library(httr)
+
+install.packages("stingi")
+
+```

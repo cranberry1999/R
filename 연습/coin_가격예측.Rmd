@@ -1,0 +1,132 @@
+---
+title: "Coin_price_prediction"
+author: "201821479_황혜린"
+date: "2018년 11월 28일"
+output: html_document
+---
+
+
+# data불러오기, 데이터프레임 정제(star,시총)
+```{r}
+getwd()
+setwd("C:/Users/hyere/Documents")
+data <- read.csv("coin.csv", header = T, stringsAsFactors = F)
+str(data)
+
+data_star <- data[c('코인이름', 'Star.갯수', '시총')]
+colnames(data_star) <- c("name", "star", "cap")
+
+data_star[,2] <- as.integer(gsub(",", "", data_star[,2]))
+data_star <- data_star[complete.cases(data_star),]  #NA제거
+
+sorted_data_star <- data_star[order(-data_star$star),]
+#신기하다. decreasing=T를 하지 않고 -를 사용해서 쉽게 만들었다! 
+#그리고 데이터프레임 형태를 그대로 가져왔다는게 좋다 
+
+```
+
+# star와 시총이 관계 그래프로 나타내기 
+```{r}
+library(ggplot2)
+
+ggplot(sorted_data_star, aes(star, cap)) +
+  geom_point(aes(size=3, colour=name)) + 
+  geom_text(aes(label = name)) + geom_smooth()
+#text기능은 첨 봤는데 label해줘서 좋네 
+
+cor(sorted_data_star$star, sorted_data_star$cap)  #상관계수 
+
+
+#비트코인, 이더리움, 리플을 아웃라이어로 생각하고 제거 
+s2 <- sorted_data_star[-c(1,2,7),]
+
+ggplot(s2, aes(star, cap)) + 
+  geom_point(aes(size=2, colour = name)) +
+  geom_text(aes(label=name)) + geom_smooth()
+
+cor(s2$star, s2$cap)
+
+
+#시가총액이 100조이하, 별이 1000개이하 
+s3 <- sorted_data_star[sorted_data_star$star <1000 & sorted_data_star$cap <100 ,]
+
+cor(s3$star, s3$cap)
+
+ggplot(s3, aes(star, cap)) + 
+  geom_point(aes(size=2, colour = name)) + 
+  geom_text(aes(label = name)) + geom_smooth()
+```
+
+# 여러 변수들을 고려해보자 
+```{r}
+setwd("C:/Users/hyere/Documents")
+bigdata <- read.csv("coin.csv", header = T, stringsAsFactors = F)
+
+
+for (i in 3:6) {
+  bigdata[,i] <- as.integer(gsub(",", "", bigdata[,i]))
+}
+
+str(bigdata)
+
+bigdata <- bigdata[complete.cases(bigdata),] #data를 interger로 바꿔주면 결측치들은 na라고 표시된다. 그 후 실행해야 하는 코드 
+```
+
+#독립변수 
+- 커밋횟수 
+- Star.갯수 
+- 코드기여자수 
+- 참조횟수 
+
+#종속변수 
+- 시가총액 
+
+#4가지 독립변수의 움직임을 통해 시총을 예측하는 모델을 만들어보자 
+```{r}
+model <- lm(시총 ~ 커밋횟수 + Star.갯수 + 코드기여자 + 참조횟수, data = bigdata)
+summary(model)
+
+#?유용한 코드인줄은 알겠는데 공부가 더 필요하다 
+#lm is used to fit linear models. It can be used to carry out regression, single stratum analysis of variance and analysis of covariance (although aov may provide a more convenient interface for these). 
+#띠용 -..
+
+target <- data.frame(커밋횟수=9492, Star.갯수=106, 코드기여자=52, 참조횟수=29)
+predict(model, newdata = target)
+```
+
+```{r}
+target <- bigdata
+result <- predict(model, newdata = target)
+result <- cbind(bigdata, result)
+str(result)
+resultfinal <- result[,c("코인이름", "시총", "result")]
+resultfinal[,4] <- resultfinal[,2] - resultfinal[,3]
+colnames(resultfinal)[4] <- "평가차이"
+resultfinal <- resultfinal[order(resultfinal$평가차이),]
+
+library(ggplot2)
+resultfinal$colour <- ifelse(resultfinal$평가차이 <0, "steelblue", "firebrick1")
+ggplot(resultfinal, aes(코인이름, 평가차이)) +
+  geom_bar(stat = "identity", fill=resultfinal$colour) +
+  coord_flip()
+#빨간색은 고평가된 코인, 파란색은 저평가된 코인 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
